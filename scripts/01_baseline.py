@@ -41,6 +41,30 @@ def load_tokenizer(model_id):
         )
     return AutoTokenizer.from_pretrained(model_id)
 
+def cuda_device_map(device):
+    if device == "cuda":
+        return {"": 0}
+    if device.startswith("cuda:"):
+        return {"": int(device.split(":", 1)[1])}
+    raise ValueError(f"Expected CUDA device, got {device}")
+
+def load_model(model_id, dtype, device):
+    load_kwargs = {
+        "torch_dtype": dtype,
+        "trust_remote_code": True,
+        "low_cpu_mem_usage": True,
+    }
+
+    if device.startswith("cuda"):
+        load_kwargs["device_map"] = cuda_device_map(device)
+        model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+        model = model.to(device)
+
+    model.eval()
+    return model
+
 def run_generation(model, tokenizer, inputs, max_new_tokens):
     with torch.inference_mode():
         output_ids = model.generate(
@@ -93,17 +117,10 @@ resolved_dtype = resolve_dtype(args.dtype, device)
 model_id = args.model_id  ### google/gemma-4-E2B is defalut
 
 tokenizer = load_tokenizer(model_id)
-model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    torch_dtype = resolved_dtype,
-    trust_remote_code = True,
-)
-model = model.to(device)
+model = load_model(model_id, resolved_dtype, device)
 
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
-
-model.eval()
 
 """ For warm-up, latency check"""
 benchmark_prompt = "Deep learning is"

@@ -1,4 +1,5 @@
 import argparse
+import inspect
 import json
 import traceback
 from datetime import datetime, timezone
@@ -44,13 +45,28 @@ def load_tokenizer(model_id):
     return AutoTokenizer.from_pretrained(model_id)
 
 
+def cuda_device_map(device):
+    if device == "cuda":
+        return {"": 0}
+    if device.startswith("cuda:"):
+        return {"": int(device.split(":", 1)[1])}
+    raise ValueError(f"Expected CUDA device, got {device}")
+
+
 def load_model(model_id, dtype, device):
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=dtype,
-        trust_remote_code=True,
-    )
-    model.to(device)
+    load_kwargs = {
+        "torch_dtype": dtype,
+        "trust_remote_code": True,
+        "low_cpu_mem_usage": True,
+    }
+
+    if device.startswith("cuda"):
+        load_kwargs["device_map"] = cuda_device_map(device)
+        model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+        model.to(device)
+
     model.eval()
     return model
 
@@ -239,6 +255,27 @@ def save_reference_logits(wrapper, wrapper_inputs, output_path):
     }
 
 
+def export_onnx(wrapper, wrapper_inputs, args, input_names, output_names, dynamic_axes):
+    export_kwargs = {
+        "model": wrapper,
+        "args": wrapper_inputs,
+        "f": args.output,
+        "input_names": input_names,
+        "output_names": output_names,
+        "dynamic_axes": dynamic_axes,
+        "opset_version": args.opset,
+        "do_constant_folding": args.constant_folding,
+    }
+
+    export_parameters = inspect.signature(torch.onnx.export).parameters
+    if "external_data" in export_parameters:
+        export_kwargs["external_data"] = not args.disable_external_data
+    elif "use_external_data_format" in export_parameters:
+        export_kwargs["use_external_data_format"] = not args.disable_external_data
+
+    torch.onnx.export(**export_kwargs)
+
+
 def export_no_cache(model, tokenizer, args, dtype, device):
     input_ids, attention_mask = prepare_no_cache_inputs(
         tokenizer=tokenizer,
@@ -258,15 +295,13 @@ def export_no_cache(model, tokenizer, args, dtype, device):
     )
 
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    torch.onnx.export(
-        wrapper,
-        wrapper_inputs,
-        args.output,
+    export_onnx(
+        wrapper=wrapper,
+        wrapper_inputs=wrapper_inputs,
+        args=args,
         input_names=input_names,
         output_names=output_names,
         dynamic_axes=dynamic_axes,
-        opset_version=args.opset,
-        do_constant_folding=True,
     )
 
     return {
@@ -275,6 +310,8 @@ def export_no_cache(model, tokenizer, args, dtype, device):
         "opset": args.opset,
         "dtype": str(dtype),
         "device": device,
+        "constant_folding": args.constant_folding,
+        "external_data": not args.disable_external_data,
         "input_names": input_names,
         "output_names": output_names,
         "dynamic_axes": dynamic_axes,
@@ -319,15 +356,13 @@ def export_with_cache(model, tokenizer, args, dtype, device):
     )
 
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    torch.onnx.export(
-        wrapper,
-        wrapper_inputs,
-        args.output,
+    export_onnx(
+        wrapper=wrapper,
+        wrapper_inputs=wrapper_inputs,
+        args=args,
         input_names=input_names,
         output_names=output_names,
         dynamic_axes=dynamic_axes,
-        opset_version=args.opset,
-        do_constant_folding=True,
     )
 
     return {
@@ -336,6 +371,8 @@ def export_with_cache(model, tokenizer, args, dtype, device):
         "opset": args.opset,
         "dtype": str(dtype),
         "device": device,
+        "constant_folding": args.constant_folding,
+        "external_data": not args.disable_external_data,
         "input_names": input_names,
         "output_names": output_names,
         "dynamic_axes": dynamic_axes,
@@ -365,6 +402,22 @@ def parse_args():
     )
     parser.add_argument("--past-seq-len", type=int, default=8)
     parser.add_argument("--opset", type=int, default=17)
+    parser.add_argument(
+        "--constant-folding",
+        action="store_true",
+        help=(
+            "Enable ONNX constant folding. Disabled by default because it can "
+            "increase peak memory for large LLM exports."
+        ),
+    )
+    parser.add_argument(
+        "--disable-external-data",
+        action="store_true",
+        help=(
+            "Write weights into the ONNX file instead of ONNX external data. "
+            "The default external-data path is safer for large models."
+        ),
+    )
     parser.add_argument("--output", type=str, default="models/gemma4_e2b_no_cache.onnx")
     parser.add_argument(
         "--metadata-output",

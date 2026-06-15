@@ -78,6 +78,14 @@ def load_tokenizer(model_id):
     return AutoTokenizer.from_pretrained(model_id)
 
 
+def cuda_device_map(device):
+    if device == "cuda":
+        return {"": 0}
+    if device.startswith("cuda:"):
+        return {"": int(device.split(":", 1)[1])}
+    raise ValueError(f"Expected CUDA device, got {device}")
+
+
 def build_quantization_config(precision, compute_dtype):
     if precision == "int8":
         return BitsAndBytesConfig(load_in_8bit=True)
@@ -103,17 +111,23 @@ def load_model(model_id, precision, device):
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             quantization_config=quantization_config,
-            device_map="auto",
             torch_dtype=dtype,
+            device_map=cuda_device_map(device),
+            low_cpu_mem_usage=True,
             trust_remote_code=True,
         )
     else:
-        model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            torch_dtype=dtype,
-            trust_remote_code=True,
-        )
-        model.to(device)
+        load_kwargs = {
+            "torch_dtype": dtype,
+            "trust_remote_code": True,
+            "low_cpu_mem_usage": True,
+        }
+        if device.startswith("cuda"):
+            load_kwargs["device_map"] = cuda_device_map(device)
+            model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+        else:
+            model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
+            model.to(device)
 
     model.eval()
     return model, dtype

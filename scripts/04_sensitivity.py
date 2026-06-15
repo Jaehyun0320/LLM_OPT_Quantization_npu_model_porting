@@ -75,6 +75,14 @@ def load_tokenizer(model_id):
     return AutoTokenizer.from_pretrained(model_id)
 
 
+def cuda_device_map(device):
+    if device == "cuda":
+        return {"": 0}
+    if device.startswith("cuda:"):
+        return {"": int(device.split(":", 1)[1])}
+    raise ValueError(f"Expected CUDA device, got {device}")
+
+
 def build_quantization_config(quantization, resolved_dtype, skip_modules):
     skip_modules = skip_modules or None
 
@@ -95,7 +103,7 @@ def build_quantization_config(quantization, resolved_dtype, skip_modules):
     )
 
 
-def load_quantized_model(model_id, quantization, resolved_dtype, skip_modules):
+def load_quantized_model(model_id, quantization, resolved_dtype, skip_modules, device):
     quantization_config = build_quantization_config(
         quantization=quantization,
         resolved_dtype=resolved_dtype,
@@ -106,7 +114,8 @@ def load_quantized_model(model_id, quantization, resolved_dtype, skip_modules):
         model_id,
         quantization_config=quantization_config,
         torch_dtype=resolved_dtype,
-        device_map="auto",
+        device_map=cuda_device_map(device),
+        low_cpu_mem_usage=True,
         trust_remote_code=True,
     )
     model.eval()
@@ -278,6 +287,7 @@ for experiment_name in experiment_names:
         quantization=args.quantization,
         resolved_dtype=resolved_dtype,
         skip_modules=skip_modules,
+        device=device,
     )
 
     module_summary = summarize_quantized_modules(model)
