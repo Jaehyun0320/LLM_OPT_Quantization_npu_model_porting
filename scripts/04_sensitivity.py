@@ -103,21 +103,30 @@ def build_quantization_config(quantization, resolved_dtype, skip_modules):
     )
 
 
-def load_quantized_model(model_id, quantization, resolved_dtype, skip_modules, device):
+def load_quantized_model(
+    model_id,
+    quantization,
+    resolved_dtype,
+    skip_modules,
+    device,
+    attn_implementation,
+):
     quantization_config = build_quantization_config(
         quantization=quantization,
         resolved_dtype=resolved_dtype,
         skip_modules=skip_modules,
     )
+    load_kwargs = {
+        "quantization_config": quantization_config,
+        "torch_dtype": resolved_dtype,
+        "device_map": cuda_device_map(device),
+        "low_cpu_mem_usage": True,
+        "trust_remote_code": True,
+    }
+    if attn_implementation != "auto":
+        load_kwargs["attn_implementation"] = attn_implementation
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        quantization_config=quantization_config,
-        torch_dtype=resolved_dtype,
-        device_map=cuda_device_map(device),
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-    )
+    model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
     model.eval()
     return model
 
@@ -233,6 +242,12 @@ def parse_args():
     parser.add_argument("--num-runs", type=int, default=3)
     parser.add_argument("--warmup-runs", type=int, default=1)
     parser.add_argument(
+        "--attn-implementation",
+        type=str,
+        default="eager",
+        choices=["auto", "eager", "sdpa", "flash_attention_2"],
+    )
+    parser.add_argument(
         "--experiments",
         type=str,
         default=",".join(SENSITIVITY_EXPERIMENTS.keys()),
@@ -288,6 +303,7 @@ for experiment_name in experiment_names:
         resolved_dtype=resolved_dtype,
         skip_modules=skip_modules,
         device=device,
+        attn_implementation=args.attn_implementation,
     )
 
     module_summary = summarize_quantized_modules(model)
@@ -312,6 +328,7 @@ for experiment_name in experiment_names:
             "component": experiment["component"],
             "quantization": args.quantization,
             "dtype_for_skipped_modules": str(resolved_dtype),
+            "attn_implementation": args.attn_implementation,
             "skip_modules": ";".join(skip_modules),
             "perplexity": perplexity,
             "latency_ms_mean": benchmark["latency_ms_mean"],
@@ -335,6 +352,7 @@ fieldnames = [
     "component",
     "quantization",
     "dtype_for_skipped_modules",
+    "attn_implementation",
     "skip_modules",
     "perplexity",
     "latency_ms_mean",

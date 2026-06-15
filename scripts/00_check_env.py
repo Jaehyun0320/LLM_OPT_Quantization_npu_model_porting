@@ -116,6 +116,7 @@ def collect_torch_info() -> dict[str, Any]:
         {
             "cuda_available": torch.cuda.is_available(),
             "cuda_version": torch.version.cuda,
+            "sdpa_supports_enable_gqa": check_sdpa_enable_gqa_support(torch),
             "mps_available": hasattr(torch.backends, "mps")
             and torch.backends.mps.is_available(),
             "selected_device": devices[0]["type"],
@@ -123,6 +124,24 @@ def collect_torch_info() -> dict[str, Any]:
         }
     )
     return status
+
+
+def check_sdpa_enable_gqa_support(torch_module) -> bool:
+    try:
+        query = torch_module.randn(1, 2, 1, 4)
+        key = torch_module.randn(1, 1, 1, 4)
+        value = torch_module.randn(1, 1, 1, 4)
+        torch_module.nn.functional.scaled_dot_product_attention(
+            query,
+            key,
+            value,
+            enable_gqa=True,
+        )
+        return True
+    except TypeError:
+        return False
+    except Exception:
+        return True
 
 
 def check_model_access(model_id: str) -> dict[str, Any]:

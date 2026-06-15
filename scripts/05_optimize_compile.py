@@ -68,12 +68,14 @@ def cuda_device_map(device):
     raise ValueError(f"Expected CUDA device, got {device}")
 
 
-def load_model(model_id, dtype, device):
+def load_model(model_id, dtype, device, attn_implementation):
     load_kwargs = {
         "torch_dtype": dtype,
         "trust_remote_code": True,
         "low_cpu_mem_usage": True,
     }
+    if attn_implementation != "auto":
+        load_kwargs["attn_implementation"] = attn_implementation
 
     if device.startswith("cuda"):
         load_kwargs["device_map"] = cuda_device_map(device)
@@ -324,6 +326,12 @@ def parse_args():
     parser.add_argument("--max-new-tokens", type=int, default=64)
     parser.add_argument("--num-runs", type=int, default=5)
     parser.add_argument("--warmup-runs", type=int, default=1)
+    parser.add_argument(
+        "--attn-implementation",
+        type=str,
+        default="eager",
+        choices=["auto", "eager", "sdpa", "flash_attention_2"],
+    )
     parser.add_argument("--run-kv-cache", action="store_true")
     parser.add_argument("--run-speculative", action="store_true")
     parser.add_argument("--output-dir", type=str, default="results/optimize")
@@ -340,7 +348,12 @@ target_tokenizer = load_tokenizer(args.model_id)
 if target_tokenizer.pad_token is None:
     target_tokenizer.pad_token = target_tokenizer.eos_token
 
-target_model = load_model(args.model_id, resolved_dtype, device)
+target_model = load_model(
+    args.model_id,
+    resolved_dtype,
+    device,
+    args.attn_implementation,
+)
 target_inputs = prepare_inputs(target_tokenizer, args.benchmark_prompt, device)
 
 if not args.run_kv_cache and not args.run_speculative:
@@ -351,6 +364,7 @@ base_metadata = {
     "model_id": args.model_id,
     "device": device,
     "dtype": str(resolved_dtype),
+    "attn_implementation": args.attn_implementation,
     "benchmark_prompt": args.benchmark_prompt,
     "generation_config": {
         "max_new_tokens": args.max_new_tokens,
@@ -416,7 +430,12 @@ if args.run_speculative:
             assistant_tokenizer,
         )
 
-        assistant_model = load_model(assistant_model_id, resolved_dtype, device)
+        assistant_model = load_model(
+            assistant_model_id,
+            resolved_dtype,
+            device,
+            args.attn_implementation,
+        )
 
         speculative_with_cache = benchmark_generation(
             model=target_model,

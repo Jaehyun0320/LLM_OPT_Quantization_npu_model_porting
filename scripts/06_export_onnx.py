@@ -53,12 +53,14 @@ def cuda_device_map(device):
     raise ValueError(f"Expected CUDA device, got {device}")
 
 
-def load_model(model_id, dtype, device):
+def load_model(model_id, dtype, device, attn_implementation):
     load_kwargs = {
         "torch_dtype": dtype,
         "trust_remote_code": True,
         "low_cpu_mem_usage": True,
     }
+    if attn_implementation != "auto":
+        load_kwargs["attn_implementation"] = attn_implementation
 
     if device.startswith("cuda"):
         load_kwargs["device_map"] = cuda_device_map(device)
@@ -403,6 +405,12 @@ def parse_args():
     parser.add_argument("--past-seq-len", type=int, default=8)
     parser.add_argument("--opset", type=int, default=17)
     parser.add_argument(
+        "--attn-implementation",
+        type=str,
+        default="eager",
+        choices=["auto", "eager", "sdpa", "flash_attention_2"],
+    )
+    parser.add_argument(
         "--constant-folding",
         action="store_true",
         help=(
@@ -441,6 +449,7 @@ def main():
         "created_at": datetime.now(timezone.utc).isoformat(),
         "model_id": args.model_id,
         "prompt": args.prompt,
+        "attn_implementation": args.attn_implementation,
         "success": False,
     }
 
@@ -449,7 +458,7 @@ def main():
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
 
-        model = load_model(args.model_id, dtype, device)
+        model = load_model(args.model_id, dtype, device, args.attn_implementation)
 
         if args.export_mode == "no_cache":
             export_metadata = export_no_cache(
@@ -477,6 +486,7 @@ def main():
                 "success": False,
                 "export_mode": args.export_mode,
                 "onnx_path": args.output,
+                "attn_implementation": args.attn_implementation,
                 "error_type": type(exc).__name__,
                 "error": str(exc),
                 "traceback": traceback.format_exc(),

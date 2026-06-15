@@ -48,12 +48,14 @@ def cuda_device_map(device):
         return {"": int(device.split(":", 1)[1])}
     raise ValueError(f"Expected CUDA device, got {device}")
 
-def load_model(model_id, dtype, device):
+def load_model(model_id, dtype, device, attn_implementation):
     load_kwargs = {
         "torch_dtype": dtype,
         "trust_remote_code": True,
         "low_cpu_mem_usage": True,
     }
+    if attn_implementation != "auto":
+        load_kwargs["attn_implementation"] = attn_implementation
 
     if device.startswith("cuda"):
         load_kwargs["device_map"] = cuda_device_map(device)
@@ -109,6 +111,16 @@ parser.add_argument('--max-new-tokens', type=int, default=30)
 parser.add_argument('--num-runs', type=int, default=5)
 parser.add_argument('--warmup-runs', type=int, default=1)
 parser.add_argument('--output', type=str, default="results/baseline.json")
+parser.add_argument(
+    "--attn-implementation",
+    type=str,
+    default="eager",
+    choices=["auto", "eager", "sdpa", "flash_attention_2"],
+    help=(
+        "Attention backend passed to Transformers. The default eager path avoids "
+        "Gemma4 SDPA enable_gqa compatibility issues on older PyTorch builds."
+    ),
+)
 
 args = parser.parse_args()
 device = resolve_device(args.device)
@@ -117,7 +129,7 @@ resolved_dtype = resolve_dtype(args.dtype, device)
 model_id = args.model_id  ### google/gemma-4-E2B is defalut
 
 tokenizer = load_tokenizer(model_id)
-model = load_model(model_id, resolved_dtype, device)
+model = load_model(model_id, resolved_dtype, device, args.attn_implementation)
 
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
@@ -233,6 +245,7 @@ result = {
     "model_id" : args.model_id,
     "device" : device, 
     "dtype" : str(resolved_dtype),
+    "attn_implementation": args.attn_implementation,
     "benchmark_prompt" : benchmark_prompt,
     "generation_config" : {
         "max_new_tokens" : args.max_new_tokens,

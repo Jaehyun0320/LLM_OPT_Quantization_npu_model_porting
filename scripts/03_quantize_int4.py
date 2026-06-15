@@ -95,6 +95,12 @@ parser.add_argument("--max-new-tokens", type=int, default=30)
 parser.add_argument("--num-runs", type=int, default=5)
 parser.add_argument("--warmup-runs", type=int, default=1)
 parser.add_argument("--output", type=str, default="results/quant_int4.json")
+parser.add_argument(
+    "--attn-implementation",
+    type=str,
+    default="eager",
+    choices=["auto", "eager", "sdpa", "flash_attention_2"],
+)
 
 args = parser.parse_args()
 device = resolve_device(args.device)
@@ -126,6 +132,11 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map=cuda_device_map(device),
     low_cpu_mem_usage=True,
     trust_remote_code=True,
+    **(
+        {}
+        if args.attn_implementation == "auto"
+        else {"attn_implementation": args.attn_implementation}
+    ),
 )
 model.eval()
 
@@ -222,6 +233,7 @@ result = {
     "model_id": args.model_id,
     "device": device,
     "dtype": str(resolved_dtype),
+    "attn_implementation": args.attn_implementation,
     "quantization": {
         "method": "bitsandbytes_int4_nf4",
         "load_in_4bit": True,

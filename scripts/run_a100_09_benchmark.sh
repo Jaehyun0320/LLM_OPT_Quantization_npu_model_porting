@@ -4,9 +4,11 @@ set -euo pipefail
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 MODEL_ID="${MODEL_ID:-google/gemma-4-E2B}"
 DEVICE="${DEVICE:-cuda}"
+ATTN_IMPLEMENTATION="${ATTN_IMPLEMENTATION:-eager}"
 WARMUP_RUNS="${WARMUP_RUNS:-1}"
 NUM_RUNS="${NUM_RUNS:-5}"
 PROMPT_VARIANTS="${PROMPT_VARIANTS:-4}"
+PRIME_CACHE="${PRIME_CACHE:-1}"
 RUN_SYNTHETIC="${RUN_SYNTHETIC:-1}"
 RUN_DIVERSE="${RUN_DIVERSE:-1}"
 RUN_BATCH="${RUN_BATCH:-1}"
@@ -16,11 +18,19 @@ LOG_FILE="${LOG_FILE:-results/a100_09_benchmark.log}"
 mkdir -p results
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
+if [[ "${PRIME_CACHE}" == "1" ]]; then
+  echo "== 00. Prime Hugging Face model cache =="
+  "${PYTHON_BIN}" scripts/00_prime_model_cache.py \
+    --model-ids "${MODEL_ID}" \
+    --output results/cache_prime_09_benchmark.json
+fi
+
 if [[ "${RUN_SYNTHETIC}" == "1" ]]; then
   echo "== 09A. Throughput benchmark: controlled synthetic prompts, default 12 configs =="
   "${PYTHON_BIN}" scripts/09_benchmark.py \
     --model-id "${MODEL_ID}" \
     --device "${DEVICE}" \
+    --attn-implementation "${ATTN_IMPLEMENTATION}" \
     --warmup-runs "${WARMUP_RUNS}" \
     --num-runs "${NUM_RUNS}" \
     --prompt-mode synthetic \
@@ -33,6 +43,7 @@ if [[ "${RUN_DIVERSE}" == "1" ]]; then
   "${PYTHON_BIN}" scripts/09_benchmark.py \
     --model-id "${MODEL_ID}" \
     --device "${DEVICE}" \
+    --attn-implementation "${ATTN_IMPLEMENTATION}" \
     --warmup-runs "${WARMUP_RUNS}" \
     --num-runs "${NUM_RUNS}" \
     --prompt-mode diverse \
@@ -45,6 +56,7 @@ if [[ "${RUN_BATCH}" == "1" ]]; then
   "${PYTHON_BIN}" scripts/09_benchmark.py \
     --model-id "${MODEL_ID}" \
     --device "${DEVICE}" \
+    --attn-implementation "${ATTN_IMPLEMENTATION}" \
     --warmup-runs "${WARMUP_RUNS}" \
     --num-runs "${NUM_RUNS}" \
     --prompt-mode synthetic \

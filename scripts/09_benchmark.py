@@ -99,7 +99,7 @@ def build_quantization_config(precision, compute_dtype):
     return None
 
 
-def load_model(model_id, precision, device):
+def load_model(model_id, precision, device, attn_implementation):
     dtype = dtype_from_precision(precision, device)
     quantization_config = build_quantization_config(precision, dtype)
 
@@ -115,6 +115,11 @@ def load_model(model_id, precision, device):
             device_map=cuda_device_map(device),
             low_cpu_mem_usage=True,
             trust_remote_code=True,
+            **(
+                {}
+                if attn_implementation == "auto"
+                else {"attn_implementation": attn_implementation}
+            ),
         )
     else:
         load_kwargs = {
@@ -122,6 +127,8 @@ def load_model(model_id, precision, device):
             "trust_remote_code": True,
             "low_cpu_mem_usage": True,
         }
+        if attn_implementation != "auto":
+            load_kwargs["attn_implementation"] = attn_implementation
         if device.startswith("cuda"):
             load_kwargs["device_map"] = cuda_device_map(device)
             model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
@@ -371,6 +378,12 @@ def parse_args():
     parser.add_argument("--warmup-runs", type=int, default=1)
     parser.add_argument("--num-runs", type=int, default=5)
     parser.add_argument(
+        "--attn-implementation",
+        type=str,
+        default="eager",
+        choices=["auto", "eager", "sdpa", "flash_attention_2"],
+    )
+    parser.add_argument(
         "--prompt-mode",
         type=str,
         default="synthetic",
@@ -431,6 +444,7 @@ def main():
         "peak_mem_mb",
         "hardware",
         "notes",
+        "attn_implementation",
         "created_at",
         "raw_ttft_ms",
         "raw_tps",
@@ -445,7 +459,12 @@ def main():
     for precision in precisions:
         model = None
         try:
-            model, dtype = load_model(args.model_id, precision, device)
+            model, dtype = load_model(
+                args.model_id,
+                precision,
+                device,
+                args.attn_implementation,
+            )
             precision_configs = [
                 config for config in configs if config["precision"] == precision
             ]
@@ -482,6 +501,7 @@ def main():
                         "peak_mem_mb": metrics["peak_mem_mb"],
                         "hardware": hardware,
                         "notes": notes,
+                        "attn_implementation": args.attn_implementation,
                         "created_at": datetime.now(timezone.utc).isoformat(),
                         "raw_ttft_ms": metrics["raw_ttft_ms"],
                         "raw_tps": metrics["raw_tps"],
@@ -503,6 +523,7 @@ def main():
                         "peak_mem_mb": "",
                         "hardware": hardware,
                         "notes": f"FAILED: {type(exc).__name__}: {exc}",
+                        "attn_implementation": args.attn_implementation,
                         "created_at": datetime.now(timezone.utc).isoformat(),
                         "raw_ttft_ms": "",
                         "raw_tps": "",

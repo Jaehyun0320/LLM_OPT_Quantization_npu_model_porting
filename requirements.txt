@@ -1,6 +1,7 @@
 torch
 transformers
 accelerate
+huggingface_hub
 bitsandbytes
 optimum
 onnx
