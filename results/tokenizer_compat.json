@@ -1,0 +1,290 @@
+{
+  "target_id": "google/gemma-4-E2B",
+  "candidates": {
+    "google/gemma-3-270m-it": {
+      "same_vocab": false,
+      "same_vocab_size": false,
+      "same_probe_encodings": true,
+      "target_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262144,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "candidate_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262145,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "target_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      },
+      "candidate_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      }
+    },
+    "google/gemma-3-270m": {
+      "same_vocab": false,
+      "same_vocab_size": false,
+      "same_probe_encodings": true,
+      "target_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262144,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "candidate_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262145,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "target_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      },
+      "candidate_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      }
+    },
+    "google/gemma-3-1b-it": {
+      "same_vocab": false,
+      "same_vocab_size": false,
+      "same_probe_encodings": true,
+      "target_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262144,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "candidate_summary": {
+        "class": "GemmaTokenizerFast",
+        "vocab_size": 262144,
+        "len": 262145,
+        "model_max_length": 1000000000000000019884624838656,
+        "bos_token": "<bos>",
+        "eos_token": "<eos>",
+        "pad_token": "<pad>",
+        "unk_token": "<unk>"
+      },
+      "target_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      },
+      "candidate_probe_encodings": {
+        "Explain quantization in one sentence:": [
+          2,
+          155122,
+          99161,
+          528,
+          886,
+          13315,
+          236787
+        ],
+        "Why does KV-cache improve autoregressive decoding?": [
+          2,
+          11355,
+          1677,
+          132182,
+          236772,
+          12655,
+          4006,
+          91102,
+          106430,
+          53255,
+          236881
+        ],
+        "A real-time chatbot should optimize for": [
+          2,
+          236776,
+          1759,
+          236772,
+          2289,
+          110130,
+          1374,
+          30726,
+          573
+        ]
+      }
+    }
+  }
+}

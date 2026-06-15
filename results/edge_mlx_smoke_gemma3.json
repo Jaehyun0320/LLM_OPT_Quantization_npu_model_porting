@@ -1,0 +1,107 @@
+{
+  "created_at": "2026-06-15T11:10:01.302348+00:00",
+  "purpose": "Smoke test for the Apple MLX conversion toolchain using a smaller Gemma 3 model supported by mlx-lm. This is not a replacement for the required Gemma 4 E2B conversion attempt.",
+  "model_id": "google/gemma-3-270m",
+  "edge_format": "mlx",
+  "mlx_path": "models/gemma3_270m_mlx_4bit",
+  "quantize": true,
+  "prompt": "Deep learning is",
+  "max_tokens": 32,
+  "environment": {
+    "python_executable": "/Library/Developer/CommandLineTools/usr/bin/python3",
+    "python_version": "3.9.6 (default, May  7 2023, 23:32:44) \n[Clang 14.0.3 (clang-1403.0.22.14.1)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "system": "Darwin",
+    "machine": "arm64",
+    "is_apple_silicon": true,
+    "mlx_lm_module_found": true,
+    "mlx_module_found": true,
+    "hf_token_set": true
+  },
+  "convert": {
+    "command": [
+      "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "-m",
+      "mlx_lm.convert",
+      "--hf-path",
+      "google/gemma-3-270m",
+      "--mlx-path",
+      "models/gemma3_270m_mlx_4bit",
+      "-q"
+    ],
+    "started_at": "2026-06-15T11:10:01.353701+00:00",
+    "returncode": 0,
+    "success": true,
+    "stdout": "Calling `python -m mlx_lm.convert ...` directly is deprecated. Use `mlx_lm.convert ...` or `python -m mlx_lm convert ...` instead.\n[INFO] Loading\n[INFO] Using dtype: bfloat16\n[INFO] Quantizing\n[INFO] Quantized model with 4.502 bits per weight.\n",
+    "stderr": "/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py:127: RuntimeWarning: 'mlx_lm.convert' found in sys.modules after import of package 'mlx_lm', but prior to execution of 'mlx_lm.convert'; this may result in unpredictable behaviour\n  warn(RuntimeWarning(msg))\n\nFetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]\nFetching 8 files:  25%|\u2588\u2588\u258c       | 2/8 [00:00<00:01,  3.71it/s]\nFetching 8 files:  50%|\u2588\u2588\u2588\u2588\u2588     | 4/8 [01:42<02:00, 30.17s/it]\nFetching 8 files: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 8/8 [01:42<00:00, 12.84s/it]\n",
+    "timed_out": false
+  },
+  "generate": {
+    "command": [
+      "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "-m",
+      "mlx_lm.generate",
+      "--model",
+      "models/gemma3_270m_mlx_4bit",
+      "--prompt",
+      "Deep learning is",
+      "--max-tokens",
+      "32"
+    ],
+    "started_at": "2026-06-15T11:11:53.007713+00:00",
+    "returncode": 0,
+    "success": true,
+    "stdout": "Calling `python -m mlx_lm.generate...` directly is deprecated. Use `mlx_lm.generate...` or `python -m mlx_lm generate ...` instead.\n==========\n a powerful and efficient approach, which can be used to solve a large number of problems. It can be used to solve a large number of problems, and it\n==========\nPrompt: 4 tokens, 5.740 tokens-per-sec\nGeneration: 32 tokens, 267.306 tokens-per-sec\nPeak memory: 0.160 GB\n",
+    "stderr": "/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py:127: RuntimeWarning: 'mlx_lm.generate' found in sys.modules after import of package 'mlx_lm', but prior to execution of 'mlx_lm.generate'; this may result in unpredictable behaviour\n  warn(RuntimeWarning(msg))\n",
+    "timed_out": false
+  },
+  "output_dir": {
+    "exists": true,
+    "path": "models/gemma3_270m_mlx_4bit",
+    "files": [
+      {
+        "path": "models/gemma3_270m_mlx_4bit/README.md",
+        "size_mb": 0.0005
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/added_tokens.json",
+        "size_mb": 0.0
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/config.json",
+        "size_mb": 0.0016
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/generation_config.json",
+        "size_mb": 0.0001
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/model.safetensors",
+        "size_mb": 143.9468
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/model.safetensors.index.json",
+        "size_mb": 0.0333
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/special_tokens_map.json",
+        "size_mb": 0.0006
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/tokenizer.json",
+        "size_mb": 31.838
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/tokenizer.model",
+        "size_mb": 4.4718
+      },
+      {
+        "path": "models/gemma3_270m_mlx_4bit/tokenizer_config.json",
+        "size_mb": 1.1018
+      }
+    ],
+    "total_size_mb": 181.3945
+  },
+  "success": true,
+  "notes": []
+}

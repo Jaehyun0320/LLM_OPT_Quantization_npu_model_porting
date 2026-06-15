@@ -1,0 +1,15 @@
+torch
+transformers
+accelerate
+bitsandbytes
+optimum
+onnx
+onnxruntime
+datasets
+evaluate
+pandas
+numpy
+psutil
+sentencepiece
+safetensors
+mlx-lm; platform_system == "Darwin" and platform_machine == "arm64"

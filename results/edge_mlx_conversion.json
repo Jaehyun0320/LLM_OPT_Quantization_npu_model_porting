@@ -1,0 +1,52 @@
+{
+  "created_at": "2026-06-15T10:13:12.403790+00:00",
+  "model_id": "google/gemma-4-E2B",
+  "edge_format": "mlx",
+  "mlx_path": "models/gemma4_e2b_mlx_4bit",
+  "quantize": true,
+  "prompt": "Deep learning is",
+  "max_tokens": 32,
+  "environment": {
+    "python_executable": "/Library/Developer/CommandLineTools/usr/bin/python3",
+    "python_version": "3.9.6 (default, May  7 2023, 23:32:44) \n[Clang 14.0.3 (clang-1403.0.22.14.1)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "system": "Darwin",
+    "machine": "arm64",
+    "is_apple_silicon": true,
+    "mlx_lm_module_found": true,
+    "mlx_module_found": true,
+    "hf_token_set": true
+  },
+  "convert": {
+    "command": [
+      "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "-m",
+      "mlx_lm.convert",
+      "--hf-path",
+      "google/gemma-4-E2B",
+      "--mlx-path",
+      "models/gemma4_e2b_mlx_4bit",
+      "-q"
+    ],
+    "started_at": "2026-06-15T10:13:12.438102+00:00",
+    "returncode": 1,
+    "success": false,
+    "stdout": "Calling `python -m mlx_lm.convert ...` directly is deprecated. Use `mlx_lm.convert ...` or `python -m mlx_lm convert ...` instead.\n[INFO] Loading\n",
+    "stderr": "/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py:127: RuntimeWarning: 'mlx_lm.convert' found in sys.modules after import of package 'mlx_lm', but prior to execution of 'mlx_lm.convert'; this may result in unpredictable behaviour\n  warn(RuntimeWarning(msg))\n\nFetching 6 files:   0%|          | 0/6 [00:00<?, ?it/s]\nFetching 6 files:  33%|\u2588\u2588\u2588\u258e      | 2/6 [00:00<00:01,  2.56it/s]\nFetching 6 files:  50%|\u2588\u2588\u2588\u2588\u2588     | 3/6 [31:31<39:23, 787.83s/it]\nFetching 6 files: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 6/6 [31:31<00:00, 315.17s/it]\nERROR:root:Model type gemma4 not supported.\nTraceback (most recent call last):\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/utils.py\", line 71, in _get_classes\n    arch = importlib.import_module(f\"mlx_lm.models.{model_type}\")\n  File \"/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/importlib/__init__.py\", line 127, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n  File \"<frozen importlib._bootstrap>\", line 1030, in _gcd_import\n  File \"<frozen importlib._bootstrap>\", line 1007, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 984, in _find_and_load_unlocked\nModuleNotFoundError: No module named 'mlx_lm.models.gemma4'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py\", line 197, in _run_module_as_main\n    return _run_code(code, main_globals, None,\n  File \"/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py\", line 87, in _run_code\n    exec(code, run_globals)\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/convert.py\", line 249, in <module>\n    main()\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/convert.py\", line 241, in main\n    convert(**vars(args))\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/convert.py\", line 111, in convert\n    model, tokenizer, config = load(\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/utils.py\", line 322, in load\n    model, config = load_model(model_path, lazy, model_config=model_config)\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/utils.py\", line 201, in load_model\n    model_class, model_args_class = get_model_classes(config=config)\n  File \"/Users/jaehyun/Library/Python/3.9/lib/python/site-packages/mlx_lm/utils.py\", line 75, in _get_classes\n    raise ValueError(msg)\nValueError: Model type gemma4 not supported.\n",
+    "timed_out": false
+  },
+  "generate": {
+    "success": null,
+    "skipped": true,
+    "reason": "Conversion failed, so generation was not attempted."
+  },
+  "output_dir": {
+    "exists": false,
+    "path": "models/gemma4_e2b_mlx_4bit",
+    "files": []
+  },
+  "success": false,
+  "notes": [
+    "Keep this JSON for the Conversion Notes section. MLX conversion can fail if the model architecture is unsupported by the installed mlx-lm version, if the gated Hugging Face token is unavailable, or if the local Apple Silicon memory/Metal runtime is insufficient."
+  ]
+}

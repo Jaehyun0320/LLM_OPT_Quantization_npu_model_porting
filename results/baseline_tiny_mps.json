@@ -1,0 +1,57 @@
+{
+  "created_at": "2026-06-15T01:08:30.577551+00:00",
+  "model_id": "sshleifer/tiny-gpt2",
+  "device": "mps",
+  "dtype": "torch.float16",
+  "benchmark_prompt": "Deep learning is",
+  "generation_config": {
+    "max_new_tokens": 20,
+    "num_runs": 5,
+    "warmup_runs": 1,
+    "do_sample": false
+  },
+  "model_size": {
+    "total_params": 102714,
+    "param_size_mb": 0.19591140747070312
+  },
+  "latency": {
+    "latency_ms_mean": 193.12441660000027,
+    "latency_ms_std": 25.867365857116003,
+    "tokens_per_second_mean": 104.91502008411229,
+    "tokens_per_second_std": 12.71178592637574,
+    "raw_latency_ms": [
+      187.79016700000108,
+      236.31779100000117,
+      192.87549999999953,
+      180.4444580000002,
+      168.19416699999934
+    ],
+    "raw_tokens_per_second": [
+      106.501848949311,
+      84.63179989694429,
+      103.69383358695141,
+      110.83743009718802,
+      118.91018789016671
+    ]
+  },
+  "quality": {
+    "metric": "perplexity",
+    "perplexity": 50258.7890625,
+    "eval_num_texts": 3,
+    "eval_max_length": 256
+  },
+  "sample_outputs": [
+    {
+      "prompt": "Explain quantization in one sentence:",
+      "output": "Explain quantization in one sentence: stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs"
+    },
+    {
+      "prompt": "Why does KV-cache improve autoregressive decoding?",
+      "output": "Why does KV-cache improve autoregressive decoding? stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs"
+    },
+    {
+      "prompt": "A real-time chatbot should optimize for",
+      "output": "A real-time chatbot should optimize for stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs stairs"
+    }
+  ]
+}
