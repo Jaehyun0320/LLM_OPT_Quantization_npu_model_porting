@@ -11,6 +11,7 @@ NUM_RUNS="${NUM_RUNS:-5}"
 MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-64}"
 PROMPT_VARIANTS="${PROMPT_VARIANTS:-4}"
 PRIME_CACHE="${PRIME_CACHE:-1}"
+LOG_MEMORY="${LOG_MEMORY:-1}"
 ASSISTANT_MODELS="${ASSISTANT_MODELS:-google/gemma-3-270m-it,google/gemma-3-270m,google/gemma-3-1b-it}"
 BATCH_BENCHMARK_CONFIGS="${BATCH_BENCHMARK_CONFIGS:-fp16:1:64:32,fp16:2:64:32,fp16:1:512:128,fp16:2:512:128,int8:1:64:32,int8:2:64:32,int8:1:512:128,int8:2:512:128,int4:1:64:32,int4:2:64:32,int4:1:512:128,int4:2:512:128}"
 
@@ -21,6 +22,11 @@ if [[ "${PRIME_CACHE}" == "1" ]]; then
   "${PYTHON_BIN}" scripts/00_prime_model_cache.py \
     --model-ids "${MODEL_ID},${ASSISTANT_MODELS}" \
     --output results/cache_prime_all.json
+fi
+
+baseline_memory_args=()
+if [[ "${LOG_MEMORY}" == "1" ]]; then
+  baseline_memory_args+=(--log-memory)
 fi
 
 echo "== 00. Environment check =="
@@ -37,6 +43,7 @@ echo "== 01. Baseline fp16 =="
   --max-new-tokens "${MAX_NEW_TOKENS}" \
   --num-runs "${NUM_RUNS}" \
   --warmup-runs "${WARMUP_RUNS}" \
+  "${baseline_memory_args[@]}" \
   --output results/baseline_gemma4_e2b.json
 
 echo "== 02. INT8 quantization =="

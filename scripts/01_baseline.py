@@ -2,6 +2,7 @@ import argparse
 import json
 import statistics
 import time
+import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from pathlib import Path
@@ -67,6 +68,56 @@ def load_model(model_id, dtype, device, attn_implementation):
     model.eval()
     return model
 
+def get_process_memory_mb():
+    try:
+        import psutil
+
+        process = psutil.Process(os.getpid())
+        memory_info = process.memory_info()
+        return {
+            "rss_mb": memory_info.rss / 1024**2,
+            "vms_mb": memory_info.vms / 1024**2,
+        }
+    except Exception:
+        return {
+            "rss_mb": None,
+            "vms_mb": None,
+        }
+
+def get_cuda_memory_mb(device):
+    if not str(device).startswith("cuda") or not torch.cuda.is_available():
+        return {
+            "cuda_allocated_mb": None,
+            "cuda_reserved_mb": None,
+            "cuda_max_allocated_mb": None,
+        }
+
+    return {
+        "cuda_allocated_mb": torch.cuda.memory_allocated() / 1024**2,
+        "cuda_reserved_mb": torch.cuda.memory_reserved() / 1024**2,
+        "cuda_max_allocated_mb": torch.cuda.max_memory_allocated() / 1024**2,
+    }
+
+def memory_snapshot(stage, device):
+    snapshot = {
+        "stage": stage,
+        "time": datetime.now(timezone.utc).isoformat(),
+        **get_process_memory_mb(),
+        **get_cuda_memory_mb(device),
+    }
+    return snapshot
+
+def log_memory(stage, device, memory_trace, enabled):
+    snapshot = memory_snapshot(stage, device)
+    memory_trace.append(snapshot)
+
+    if enabled:
+        printable = ", ".join(
+            f"{key}={value:.2f}" if isinstance(value, float) else f"{key}={value}"
+            for key, value in snapshot.items()
+        )
+        print(f"[memory] {printable}", flush=True)
+
 def run_generation(model, tokenizer, inputs, max_new_tokens):
     with torch.inference_mode():
         output_ids = model.generate(
@@ -121,32 +172,48 @@ parser.add_argument(
         "Gemma4 SDPA enable_gqa compatibility issues on older PyTorch builds."
     ),
 )
+parser.add_argument(
+    "--log-memory",
+    action="store_true",
+    help="Print CPU RSS and CUDA memory checkpoints during baseline execution.",
+)
 
 args = parser.parse_args()
 device = resolve_device(args.device)
 resolved_dtype = resolve_dtype(args.dtype, device)
+memory_trace = []
+log_memory("start", device, memory_trace, args.log_memory)
 
 model_id = args.model_id  ### google/gemma-4-E2B is defalut
 
 tokenizer = load_tokenizer(model_id)
+log_memory("after_tokenizer_load", device, memory_trace, args.log_memory)
 model = load_model(model_id, resolved_dtype, device, args.attn_implementation)
+log_memory("after_model_load", device, memory_trace, args.log_memory)
 
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
+log_memory("after_pad_token_setup", device, memory_trace, args.log_memory)
 
 """ For warm-up, latency check"""
 benchmark_prompt = "Deep learning is"
 inputs = tokenizer(benchmark_prompt, return_tensors = "pt")
+log_memory("after_prompt_tokenize_cpu", device, memory_trace, args.log_memory)
 inputs = {k: v.to(device) for k, v in inputs.items()}
+log_memory("after_prompt_inputs_to_device", device, memory_trace, args.log_memory)
 
 """ Warm up """
 for _ in range(args.warmup_runs):
+    log_memory("before_warmup_generate", device, memory_trace, args.log_memory)
     _ = run_generation(
         model = model,
         tokenizer = tokenizer,
         inputs = inputs,
         max_new_tokens = args.max_new_tokens,
     )
+    if device == "cuda":
+        torch.cuda.synchronize()
+    log_memory("after_warmup_generate", device, memory_trace, args.log_memory)
 
 if device == "cuda":
     torch.cuda.synchronize()
@@ -259,6 +326,7 @@ result = {
     },
     "memory": {
         "peak_cuda_memory_mb": peak_cuda_memory_mb,
+        "trace": memory_trace,
     },
     "latency": {
         "latency_ms_mean": latency_ms_mean,
