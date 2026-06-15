@@ -4,13 +4,17 @@ set -euo pipefail
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 MODEL_ID="${MODEL_ID:-google/gemma-4-E2B}"
 DEVICE="${DEVICE:-cuda}"
-DTYPE="${DTYPE:-fp16}"
+DTYPE="${DTYPE:-bf16}"
 ATTN_IMPLEMENTATION="${ATTN_IMPLEMENTATION:-eager}"
 WARMUP_RUNS="${WARMUP_RUNS:-1}"
 NUM_RUNS="${NUM_RUNS:-5}"
 MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-64}"
 PRIME_CACHE="${PRIME_CACHE:-1}"
 LOG_MEMORY="${LOG_MEMORY:-1}"
+LOAD_DEVICE_MAP="${LOAD_DEVICE_MAP:-auto}"
+MAX_GPU_MEMORY="${MAX_GPU_MEMORY:-70GiB}"
+MAX_CPU_MEMORY="${MAX_CPU_MEMORY:-80GiB}"
+OFFLOAD_FOLDER="${OFFLOAD_FOLDER:-models/offload/baseline}"
 ASSISTANT_MODELS="${ASSISTANT_MODELS:-google/gemma-3-270m-it,google/gemma-3-270m,google/gemma-3-1b-it}"
 LOG_FILE="${LOG_FILE:-results/a100_00_05.log}"
 
@@ -34,12 +38,16 @@ echo "== 00. Environment check =="
   --check-model-access \
   --output results/env.json
 
-echo "== 01. Baseline fp16 =="
+echo "== 01. Baseline ${DTYPE} =="
 "${PYTHON_BIN}" scripts/01_baseline.py \
   --model-id "${MODEL_ID}" \
   --device "${DEVICE}" \
   --dtype "${DTYPE}" \
   --attn-implementation "${ATTN_IMPLEMENTATION}" \
+  --load-device-map "${LOAD_DEVICE_MAP}" \
+  --max-gpu-memory "${MAX_GPU_MEMORY}" \
+  --max-cpu-memory "${MAX_CPU_MEMORY}" \
+  --offload-folder "${OFFLOAD_FOLDER}" \
   --max-new-tokens "${MAX_NEW_TOKENS}" \
   --num-runs "${NUM_RUNS}" \
   --warmup-runs "${WARMUP_RUNS}" \

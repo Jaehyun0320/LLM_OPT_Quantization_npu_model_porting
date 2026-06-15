@@ -4,7 +4,7 @@ set -euo pipefail
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 MODEL_ID="${MODEL_ID:-google/gemma-4-E2B}"
 DEVICE="${DEVICE:-cuda}"
-DTYPE="${DTYPE:-fp16}"
+DTYPE="${DTYPE:-bf16}"
 ATTN_IMPLEMENTATION="${ATTN_IMPLEMENTATION:-eager}"
 OPSET="${OPSET:-17}"
 PROMPT="${PROMPT:-Deep learning is}"

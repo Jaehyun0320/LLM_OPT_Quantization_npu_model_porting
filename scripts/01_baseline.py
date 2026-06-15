@@ -49,7 +49,29 @@ def cuda_device_map(device):
         return {"": int(device.split(":", 1)[1])}
     raise ValueError(f"Expected CUDA device, got {device}")
 
-def load_model(model_id, dtype, device, attn_implementation):
+def cuda_device_index(device):
+    if device == "cuda":
+        return 0
+    if device.startswith("cuda:"):
+        return int(device.split(":", 1)[1])
+    raise ValueError(f"Expected CUDA device, got {device}")
+
+def build_max_memory(device, max_gpu_memory, max_cpu_memory):
+    return {
+        cuda_device_index(device): max_gpu_memory,
+        "cpu": max_cpu_memory,
+    }
+
+def load_model(
+    model_id,
+    dtype,
+    device,
+    attn_implementation,
+    load_device_map,
+    max_gpu_memory,
+    max_cpu_memory,
+    offload_folder,
+):
     load_kwargs = {
         "torch_dtype": dtype,
         "trust_remote_code": True,
@@ -59,7 +81,19 @@ def load_model(model_id, dtype, device, attn_implementation):
         load_kwargs["attn_implementation"] = attn_implementation
 
     if device.startswith("cuda"):
-        load_kwargs["device_map"] = cuda_device_map(device)
+        if load_device_map == "auto":
+            offload_path = Path(offload_folder)
+            offload_path.mkdir(parents=True, exist_ok=True)
+            load_kwargs["device_map"] = "auto"
+            load_kwargs["max_memory"] = build_max_memory(
+                device=device,
+                max_gpu_memory=max_gpu_memory,
+                max_cpu_memory=max_cpu_memory,
+            )
+            load_kwargs["offload_folder"] = str(offload_path)
+            load_kwargs["offload_state_dict"] = True
+        else:
+            load_kwargs["device_map"] = cuda_device_map(device)
         model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
     else:
         model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
@@ -177,6 +211,35 @@ parser.add_argument(
     action="store_true",
     help="Print CPU RSS and CUDA memory checkpoints during baseline execution.",
 )
+parser.add_argument(
+    "--load-device-map",
+    type=str,
+    default="auto",
+    choices=["cuda", "auto"],
+    help=(
+        "CUDA loading strategy. auto uses Accelerate device_map with memory "
+        "budgets and optional CPU/disk offload; cuda loads the full model "
+        "directly on one CUDA device."
+    ),
+)
+parser.add_argument(
+    "--max-gpu-memory",
+    type=str,
+    default="70GiB",
+    help="GPU memory budget used when --load-device-map auto is selected.",
+)
+parser.add_argument(
+    "--max-cpu-memory",
+    type=str,
+    default="80GiB",
+    help="CPU memory budget used when --load-device-map auto is selected.",
+)
+parser.add_argument(
+    "--offload-folder",
+    type=str,
+    default="models/offload/baseline",
+    help="Disk offload directory used when --load-device-map auto is selected.",
+)
 
 args = parser.parse_args()
 device = resolve_device(args.device)
@@ -188,7 +251,16 @@ model_id = args.model_id  ### google/gemma-4-E2B is defalut
 
 tokenizer = load_tokenizer(model_id)
 log_memory("after_tokenizer_load", device, memory_trace, args.log_memory)
-model = load_model(model_id, resolved_dtype, device, args.attn_implementation)
+model = load_model(
+    model_id=model_id,
+    dtype=resolved_dtype,
+    device=device,
+    attn_implementation=args.attn_implementation,
+    load_device_map=args.load_device_map,
+    max_gpu_memory=args.max_gpu_memory,
+    max_cpu_memory=args.max_cpu_memory,
+    offload_folder=args.offload_folder,
+)
 log_memory("after_model_load", device, memory_trace, args.log_memory)
 
 if tokenizer.pad_token is None:
@@ -313,6 +385,14 @@ result = {
     "device" : device, 
     "dtype" : str(resolved_dtype),
     "attn_implementation": args.attn_implementation,
+    "model_loading": {
+        "load_device_map": args.load_device_map,
+        "max_gpu_memory": args.max_gpu_memory,
+        "max_cpu_memory": args.max_cpu_memory,
+        "offload_folder": args.offload_folder,
+        "dtype": str(resolved_dtype),
+        "attn_implementation": args.attn_implementation,
+    },
     "benchmark_prompt" : benchmark_prompt,
     "generation_config" : {
         "max_new_tokens" : args.max_new_tokens,
