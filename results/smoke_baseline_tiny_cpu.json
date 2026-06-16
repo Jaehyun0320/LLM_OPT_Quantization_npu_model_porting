@@ -1,0 +1,119 @@
+{
+  "created_at": "2026-06-15T14:17:22.742819+00:00",
+  "model_id": "sshleifer/tiny-gpt2",
+  "device": "cpu",
+  "dtype": "torch.float32",
+  "attn_implementation": "eager",
+  "model_loading": {
+    "load_device_map": "auto",
+    "max_gpu_memory": "70GiB",
+    "max_cpu_memory": "80GiB",
+    "offload_folder": "models/offload/baseline",
+    "dtype": "torch.float32",
+    "attn_implementation": "eager"
+  },
+  "benchmark_prompt": "Deep learning is",
+  "generation_config": {
+    "max_new_tokens": 8,
+    "num_runs": 2,
+    "warmup_runs": 0,
+    "do_sample": false
+  },
+  "model_size": {
+    "total_params": 102714,
+    "param_size_mb": 0.39182281494140625
+  },
+  "memory": {
+    "peak_cuda_memory_mb": null,
+    "trace": [
+      {
+        "stage": "start",
+        "time": "2026-06-15T14:17:19.398271+00:00",
+        "rss_mb": 249.875,
+        "vms_mb": 425423.5625,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      },
+      {
+        "stage": "after_tokenizer_load",
+        "time": "2026-06-15T14:17:20.643752+00:00",
+        "rss_mb": 207.625,
+        "vms_mb": 425504.171875,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      },
+      {
+        "stage": "after_model_load",
+        "time": "2026-06-15T14:17:22.558916+00:00",
+        "rss_mb": 224.40625,
+        "vms_mb": 425834.296875,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      },
+      {
+        "stage": "after_pad_token_setup",
+        "time": "2026-06-15T14:17:22.559192+00:00",
+        "rss_mb": 224.515625,
+        "vms_mb": 425834.296875,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      },
+      {
+        "stage": "after_prompt_tokenize_cpu",
+        "time": "2026-06-15T14:17:22.563594+00:00",
+        "rss_mb": 225.625,
+        "vms_mb": 425850.671875,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      },
+      {
+        "stage": "after_prompt_inputs_to_device",
+        "time": "2026-06-15T14:17:22.563961+00:00",
+        "rss_mb": 225.640625,
+        "vms_mb": 425850.671875,
+        "cuda_allocated_mb": null,
+        "cuda_reserved_mb": null,
+        "cuda_max_allocated_mb": null
+      }
+    ]
+  },
+  "latency": {
+    "latency_ms_mean": 42.428416499999955,
+    "latency_ms_std": 27.741212532403903,
+    "tokens_per_second_mean": 239.81304731062332,
+    "tokens_per_second_std": 156.7983267414055,
+    "raw_latency_ms": [
+      62.04441599999999,
+      22.81241699999992
+    ],
+    "raw_tokens_per_second": [
+      128.9398871930715,
+      350.6862074281751
+    ]
+  },
+  "quality": {
+    "metric": "perplexity",
+    "perplexity": 50258.9296875,
+    "eval_num_texts": 3,
+    "eval_max_length": 256
+  },
+  "sample_outputs": [
+    {
+      "prompt": "Explain quantization in one sentence:",
+      "output": "Explain quantization in one sentence: stairs stairs stairs stairs stairs stairs stairs stairs"
+    },
+    {
+      "prompt": "Why does KV-cache improve autoregressive decoding?",
+      "output": "Why does KV-cache improve autoregressive decoding? stairs stairs stairs stairs stairs stairs stairs stairs"
+    },
+    {
+      "prompt": "A real-time chatbot should optimize for",
+      "output": "A real-time chatbot should optimize for stairs stairs stairs stairs stairs stairs stairs stairs"
+    }
+  ]
+}

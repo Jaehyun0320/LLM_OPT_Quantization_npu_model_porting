@@ -183,7 +183,6 @@ class NoCacheWrapper(torch.nn.Module):
     def forward(self, input_ids, attention_mask):
         outputs = self.model(
             input_ids=input_ids,
-            attention_mask=attention_mask,
             use_cache=False,
             return_dict=True,
         )

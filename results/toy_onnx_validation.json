@@ -1,0 +1,436 @@
+{
+  "created_at": "2026-06-16T01:44:43.260196+00:00",
+  "purpose": "Standalone toy ONNX Runtime validation smoke test. This consumes ONNX files produced by scripts/06_1_toy_onnx_smoke.py and scripts/06_2_toy_kv_cache_onnx_smoke.py, then re-computes the PyTorch references and compares them with ORT outputs.",
+  "success": true,
+  "mode": "both",
+  "runtime": {
+    "requested_provider": "cpu",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "available_providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ]
+  },
+  "validations": {
+    "no_cache": {
+      "success": true,
+      "onnx_path": "models/toy_causal_lm_smoke.onnx",
+      "model": {
+        "type": "ToyCausalLM",
+        "vocab_size": 32,
+        "hidden_size": 16
+      },
+      "inputs": {
+        "input_ids_shape": [
+          1,
+          8
+        ],
+        "attention_mask_shape": [
+          1,
+          8
+        ]
+      },
+      "comparison": {
+        "torch_logits_shape": [
+          1,
+          8,
+          32
+        ],
+        "onnx_logits_shape": [
+          1,
+          8,
+          32
+        ],
+        "max_abs_diff": 3.5762786865234375e-07,
+        "mean_abs_diff": 3.814420779235661e-08,
+        "tolerance": 1e-05,
+        "passed": true
+      }
+    },
+    "with_cache": {
+      "success": true,
+      "onnx_path": "models/toy_kv_cache_causal_lm_smoke.onnx",
+      "model": {
+        "type": "ToyKVCachedCausalLM",
+        "vocab_size": 32,
+        "hidden_size": 16,
+        "num_heads": 2,
+        "head_dim": 8
+      },
+      "inputs": {
+        "input_ids_shape": [
+          1,
+          1
+        ],
+        "attention_mask_shape": [
+          1,
+          5
+        ],
+        "past_key_shape": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "past_value_shape": [
+          1,
+          2,
+          4,
+          8
+        ]
+      },
+      "single_step": {
+        "logits": {
+          "torch_shape": [
+            1,
+            1,
+            32
+          ],
+          "onnx_shape": [
+            1,
+            1,
+            32
+          ],
+          "max_abs_diff": 2.2351741790771484e-08,
+          "mean_abs_diff": 7.130438461899757e-09,
+          "tolerance": 1e-05,
+          "passed": true
+        },
+        "present_key": {
+          "torch_shape": [
+            1,
+            2,
+            5,
+            8
+          ],
+          "onnx_shape": [
+            1,
+            2,
+            5,
+            8
+          ],
+          "max_abs_diff": 1.1920928955078125e-07,
+          "mean_abs_diff": 8.568167508826718e-09,
+          "tolerance": 1e-05,
+          "passed": true
+        },
+        "present_value": {
+          "torch_shape": [
+            1,
+            2,
+            5,
+            8
+          ],
+          "onnx_shape": [
+            1,
+            2,
+            5,
+            8
+          ],
+          "max_abs_diff": 1.1920928955078125e-07,
+          "mean_abs_diff": 7.389462375329003e-09,
+          "tolerance": 1e-05,
+          "passed": true
+        },
+        "cache_sequence_grew": true,
+        "passed": true
+      },
+      "loop": {
+        "steps": 4,
+        "passed": true,
+        "shape_trace": [
+          {
+            "step": 0,
+            "past_key_shape": [
+              1,
+              2,
+              5,
+              8
+            ],
+            "present_key_shape": [
+              1,
+              2,
+              6,
+              8
+            ],
+            "cache_sequence_grew_by": 1
+          },
+          {
+            "step": 1,
+            "past_key_shape": [
+              1,
+              2,
+              6,
+              8
+            ],
+            "present_key_shape": [
+              1,
+              2,
+              7,
+              8
+            ],
+            "cache_sequence_grew_by": 1
+          },
+          {
+            "step": 2,
+            "past_key_shape": [
+              1,
+              2,
+              7,
+              8
+            ],
+            "present_key_shape": [
+              1,
+              2,
+              8,
+              8
+            ],
+            "cache_sequence_grew_by": 1
+          },
+          {
+            "step": 3,
+            "past_key_shape": [
+              1,
+              2,
+              8,
+              8
+            ],
+            "present_key_shape": [
+              1,
+              2,
+              9,
+              8
+            ],
+            "cache_sequence_grew_by": 1
+          }
+        ],
+        "comparisons": [
+          {
+            "step": 0,
+            "logits": {
+              "torch_shape": [
+                1,
+                1,
+                32
+              ],
+              "onnx_shape": [
+                1,
+                1,
+                32
+              ],
+              "max_abs_diff": 2.9802322387695312e-08,
+              "mean_abs_diff": 7.75253283791244e-09,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_key": {
+              "torch_shape": [
+                1,
+                2,
+                6,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                6,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 7.140139590688932e-09,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_value": {
+              "torch_shape": [
+                1,
+                2,
+                6,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                6,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 6.1578853127741695e-09,
+              "tolerance": 1e-05,
+              "passed": true
+            }
+          },
+          {
+            "step": 1,
+            "logits": {
+              "torch_shape": [
+                1,
+                1,
+                32
+              ],
+              "onnx_shape": [
+                1,
+                1,
+                32
+              ],
+              "max_abs_diff": 2.2351741790771484e-08,
+              "mean_abs_diff": 7.010385161265731e-09,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_key": {
+              "torch_shape": [
+                1,
+                2,
+                7,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                7,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 1.0843256070813823e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_value": {
+              "torch_shape": [
+                1,
+                2,
+                7,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                7,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 1.1498092256090331e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            }
+          },
+          {
+            "step": 2,
+            "logits": {
+              "torch_shape": [
+                1,
+                1,
+                32
+              ],
+              "onnx_shape": [
+                1,
+                1,
+                32
+              ],
+              "max_abs_diff": 1.862645149230957e-08,
+              "mean_abs_diff": 7.112248567864299e-09,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_key": {
+              "torch_shape": [
+                1,
+                2,
+                8,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                8,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 1.210719347000122e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_value": {
+              "torch_shape": [
+                1,
+                2,
+                8,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                8,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 1.4077158994041383e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            }
+          },
+          {
+            "step": 3,
+            "logits": {
+              "torch_shape": [
+                1,
+                1,
+                32
+              ],
+              "onnx_shape": [
+                1,
+                1,
+                32
+              ],
+              "max_abs_diff": 3.5390257835388184e-08,
+              "mean_abs_diff": 1.1990778148174286e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_key": {
+              "torch_shape": [
+                1,
+                2,
+                9,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                9,
+                8
+              ],
+              "max_abs_diff": 1.1920928955078125e-07,
+              "mean_abs_diff": 1.4952901139508867e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            },
+            "present_value": {
+              "torch_shape": [
+                1,
+                2,
+                9,
+                8
+              ],
+              "onnx_shape": [
+                1,
+                2,
+                9,
+                8
+              ],
+              "max_abs_diff": 2.384185791015625e-07,
+              "mean_abs_diff": 1.8217381381191444e-08,
+              "tolerance": 1e-05,
+              "passed": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  "note": "This validates the ONNX/ORT pipeline on ONNX-friendly toy graphs. It does not prove that Gemma4/tiny-gpt2 HF export works, because those failed earlier in the Transformers causal-mask exporter path."
+}

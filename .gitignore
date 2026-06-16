@@ -10,6 +10,8 @@ models/
 
 # Local virtual environments and caches
 .venv/
+.venv-mlx/
 venv/
+.vscode/
 .env
 .cache/

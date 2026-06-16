@@ -1,0 +1,8 @@
+# Apple MLX / MLX-LM environment for Gemma 4 edge-format experiments.
+# Use Python 3.12+ on Apple Silicon:
+#   /opt/homebrew/bin/python3.12 -m venv .venv-mlx
+#   source .venv-mlx/bin/activate
+#   python -m pip install -r requirements-mlx.txt
+
+mlx==0.31.2; platform_system == "Darwin" and platform_machine == "arm64" and python_version >= "3.12"
+mlx-lm==0.31.3; platform_system == "Darwin" and platform_machine == "arm64" and python_version >= "3.12"

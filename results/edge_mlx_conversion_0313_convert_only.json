@@ -1,0 +1,52 @@
+{
+  "created_at": "2026-06-16T03:30:00.706267+00:00",
+  "model_id": "google/gemma-4-E2B",
+  "edge_format": "mlx",
+  "mlx_path": "models/gemma4_e2b_mlx_4bit_0313",
+  "quantize": true,
+  "prompt": "Deep learning is",
+  "max_tokens": 32,
+  "environment": {
+    "python_executable": "/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/bin/python",
+    "python_version": "3.12.13 (main, Mar  3 2026, 12:39:30) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "system": "Darwin",
+    "machine": "arm64",
+    "is_apple_silicon": true,
+    "mlx_lm_module_found": true,
+    "mlx_module_found": true,
+    "hf_token_set": true
+  },
+  "convert": {
+    "command": [
+      "/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/bin/python",
+      "-m",
+      "mlx_lm.convert",
+      "--hf-path",
+      "google/gemma-4-E2B",
+      "--mlx-path",
+      "models/gemma4_e2b_mlx_4bit_0313",
+      "-q"
+    ],
+    "started_at": "2026-06-16T03:30:00.759748+00:00",
+    "returncode": 1,
+    "success": false,
+    "stdout": "Calling `python -m mlx_lm.convert ...` directly is deprecated. Use `mlx_lm.convert ...` or `python -m mlx_lm convert ...` instead.\n[INFO] Loading\n",
+    "stderr": "<frozen runpy>:128: RuntimeWarning: 'mlx_lm.convert' found in sys.modules after import of package 'mlx_lm', but prior to execution of 'mlx_lm.convert'; this may result in unpredictable behaviour\n\nFetching 6 files:   0%|          | 0/6 [00:00<?, ?it/s]\nFetching 6 files: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 6/6 [00:00<00:00, 9201.40it/s]\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx_lm/convert.py\", line 267, in <module>\n    main()\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx_lm/convert.py\", line 259, in main\n    convert(**vars(args))\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx_lm/convert.py\", line 112, in convert\n    model, tokenizer, config = load(\n                               ^^^^^\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx_lm/utils.py\", line 491, in load\n    model, config = load_model(model_path, lazy, model_config=model_config)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx_lm/utils.py\", line 415, in load_model\n    model.load_weights(list(weights.items()), strict=strict)\n  File \"/Users/jaehyun/Desktop/zetic assignment/.venv-mlx/lib/python3.12/site-packages/mlx/nn/layers/base.py\", line 185, in load_weights\n    raise ValueError(\nValueError: Received 60 parameters not in model: \nlanguage_model.model.layers.15.self_attn.k_norm.weight,\nlanguage_model.model.layers.15.self_attn.k_proj.weight,\nlanguage_model.model.layers.15.self_attn.v_proj.weight,\nlanguage_model.model.layers.16.self_attn.k_norm.weight,\nlanguage_model.model.layers.16.self_attn.k_proj.weight,\nlanguage_model.model.layers.16.self_attn.v_proj.weight,\nlanguage_model.model.layers.17.self_attn.k_norm.weight,\nlanguage_model.model.layers.17.self_attn.k_proj.weight,\nlanguage_model.model.layers.17.self_attn.v_proj.weight,\nlanguage_model.model.layers.18.self_attn.k_norm.weight,\nlanguage_model.model.layers.18.self_attn.k_proj.weight,\nlanguage_model.model.layers.18.self_attn.v_proj.weight,\nlanguage_model.model.layers.19.self_attn.k_norm.weight,\nlanguage_model.model.layers.19.self_attn.k_proj.weight,\nlanguage_model.model.layers.19.self_attn.v_proj.weight,\nlanguage_model.model.layers.20.self_attn.k_norm.weight,\nlanguage_model.model.layers.20.self_attn.k_proj.weight,\nlanguage_model.model.layers.20.self_attn.v_proj.weight,\nlanguage_model.model.layers.21.self_attn.k_norm.weight,\nlanguage_model.model.layers.21.self_attn.k_proj.weight,\nlanguage_model.model.layers.21.self_attn.v_proj.weight,\nlanguage_model.model.layers.22.self_attn.k_norm.weight,\nlanguage_model.model.layers.22.self_attn.k_proj.weight,\nlanguage_model.model.layers.22.self_attn.v_proj.weight,\nlanguage_model.model.layers.23.self_attn.k_norm.weight,\nlanguage_model.model.layers.23.self_attn.k_proj.weight,\nlanguage_model.model.layers.23.self_attn.v_proj.weight,\nlanguage_model.model.layers.24.self_attn.k_norm.weight,\nlanguage_model.model.layers.24.self_attn.k_proj.weight,\nlanguage_model.model.layers.24.self_attn.v_proj.weight,\nlanguage_model.model.layers.25.self_attn.k_norm.weight,\nlanguage_model.model.layers.25.self_attn.k_proj.weight,\nlanguage_model.model.layers.25.self_attn.v_proj.weight,\nlanguage_model.model.layers.26.self_attn.k_norm.weight,\nlanguage_model.model.layers.26.self_attn.k_proj.weight,\nlanguage_model.model.layers.26.self_attn.v_proj.weight,\nlanguage_model.model.layers.27.self_attn.k_norm.weight,\nlanguage_model.model.layers.27.self_attn.k_proj.weight,\nlanguage_model.model.layers.27.self_attn.v_proj.weight,\nlanguage_model.model.layers.28.self_attn.k_norm.weight,\nlanguage_model.model.layers.28.self_attn.k_proj.weight,\nlanguage_model.model.layers.28.self_attn.v_proj.weight,\nlanguage_model.model.layers.29.self_attn.k_norm.weight,\nlanguage_model.model.layers.29.self_attn.k_proj.weight,\nlanguage_model.model.layers.29.self_attn.v_proj.weight,\nlanguage_model.model.layers.30.self_attn.k_norm.weight,\nlanguage_model.model.layers.30.self_attn.k_proj.weight,\nlanguage_model.model.layers.30.self_attn.v_proj.weight,\nlanguage_model.model.layers.31.self_attn.k_norm.weight,\nlanguage_model.model.layers.31.self_attn.k_proj.weight,\nlanguage_model.model.layers.31.self_attn.v_proj.weight,\nlanguage_model.model.layers.32.self_attn.k_norm.weight,\nlanguage_model.model.layers.32.self_attn.k_proj.weight,\nlanguage_model.model.layers.32.self_attn.v_proj.weight,\nlanguage_model.model.layers.33.self_attn.k_norm.weight,\nlanguage_model.model.layers.33.self_attn.k_proj.weight,\nlanguage_model.model.layers.33.self_attn.v_proj.weight,\nlanguage_model.model.layers.34.self_attn.k_norm.weight,\nlanguage_model.model.layers.34.self_attn.k_proj.weight,\nlanguage_model.model.layers.34.self_attn.v_proj.weight.\n",
+    "timed_out": false
+  },
+  "generate": {
+    "success": null,
+    "skipped": true,
+    "reason": "--skip-generate was set."
+  },
+  "output_dir": {
+    "exists": false,
+    "path": "models/gemma4_e2b_mlx_4bit_0313",
+    "files": []
+  },
+  "success": false,
+  "notes": [
+    "Keep this JSON for the Conversion Notes section. MLX conversion can fail if the model architecture is unsupported by the installed mlx-lm version, if the gated Hugging Face token is unavailable, or if the local Apple Silicon memory/Metal runtime is insufficient."
+  ]
+}

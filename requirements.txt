@@ -13,4 +13,3 @@ numpy
 psutil
 sentencepiece
 safetensors
-mlx-lm; platform_system == "Darwin" and platform_machine == "arm64"
