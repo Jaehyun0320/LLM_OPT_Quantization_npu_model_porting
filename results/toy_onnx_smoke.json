@@ -1,0 +1,73 @@
+{
+  "created_at": "2026-06-16T00:52:34.998732+00:00",
+  "purpose": "Toy causal-LM smoke test for ONNX export and ONNX Runtime validation. This avoids Hugging Face Transformers masking_utils so it checks the local ONNX pipeline separately from Gemma4 or tiny-gpt2 exporter compatibility.",
+  "success": true,
+  "model": {
+    "type": "ToyCausalLM",
+    "vocab_size": 32,
+    "hidden_size": 16,
+    "uses_attention_mask": true,
+    "uses_causal_mask": true
+  },
+  "export": {
+    "onnx_path": "models/toy_causal_lm_smoke.onnx",
+    "opset": 17,
+    "input_names": [
+      "input_ids",
+      "attention_mask"
+    ],
+    "output_names": [
+      "logits"
+    ]
+  },
+  "runtime": {
+    "requested_provider": "cpu",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "available_providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ]
+  },
+  "inputs": {
+    "input_ids_shape": [
+      1,
+      8
+    ],
+    "attention_mask_shape": [
+      1,
+      8
+    ],
+    "attention_mask": [
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    ]
+  },
+  "comparison": {
+    "torch_logits_shape": [
+      1,
+      8,
+      32
+    ],
+    "onnx_logits_shape": [
+      1,
+      8,
+      32
+    ],
+    "max_abs_diff": 3.5762786865234375e-07,
+    "mean_abs_diff": 3.814420779235661e-08,
+    "tolerance": 1e-05,
+    "passed": true
+  },
+  "note": "Passing this smoke test does not mean Gemma4 exports successfully. It only verifies that a small ONNX-friendly causal LM graph can be exported and numerically validated with ONNX Runtime."
+}
