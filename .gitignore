@@ -7,6 +7,7 @@ models/
 *.onnx
 *.pt
 *.safetensors
+*.zip
 
 # Local virtual environments and caches
 .venv/

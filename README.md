@@ -38,6 +38,7 @@ scripts/07_1_validate_toy_onnx_smoke.py Toy ONNX validation-only smoke test
 scripts/08_convert_edge.py           Apple MLX conversion/generation wrapper
 scripts/08_1_convert_edge_smoke.py   Gemma 3 MLX smoke test
 scripts/09_benchmark.py              TTFT/TPS/peak-memory benchmark harness
+docs/RUN_*.md                        Detailed command guides for each experiment group
 ```
 
 The main reports are:
@@ -100,31 +101,31 @@ The previous system Python environment used `mlx-lm 0.29.1`, which did not inclu
 For quantization and sensitivity experiments, see:
 
 ```text
-RUN_01_04_QUANTIZATION.md
+docs/RUN_01_04_QUANTIZATION.md
 ```
 
 For KV-cache and speculative decoding experiments, see:
 
 ```text
-RUN_05_OPTIMIZATION.md
+docs/RUN_05_OPTIMIZATION.md
 ```
 
 For ONNX export and validation, see:
 
 ```text
-RUN_06_07_ONNX.md
+docs/RUN_06_07_ONNX.md
 ```
 
 For MLX Gemma 4 retry commands, see:
 
 ```text
-RUN_08_MLX_0313.md
+docs/RUN_08_MLX_0313.md
 ```
 
 For throughput benchmarking, see:
 
 ```text
-RUN_09_BENCHMARK.md
+docs/RUN_09_BENCHMARK.md
 ```
 
 ## Quick Local Smoke Tests
